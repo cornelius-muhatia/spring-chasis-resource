@@ -1,0 +1,2 @@
+1. Enable swagger documentation to document unique fields from entity fields
+2. For @ManyToMany collection validate if they exists
