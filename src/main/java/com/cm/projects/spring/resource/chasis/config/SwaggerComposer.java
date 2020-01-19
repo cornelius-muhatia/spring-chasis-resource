@@ -15,7 +15,6 @@
  */
 package com.cm.projects.spring.resource.chasis.config;
 
-import com.cm.projects.spring.resource.chasis.annotations.ApiChasisParam;
 import com.google.common.base.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +43,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Objects;
+import com.cm.projects.spring.resource.chasis.annotations.ApiChasisEntity;
 
 /**
  * @author Cornelius M
@@ -71,7 +71,7 @@ public class SwaggerComposer implements OperationModelsProviderPlugin, Operation
 
     @Override
     public void apply(RequestMappingContext context) {
-        Optional<ApiChasisParam> chasisParam = context.findAnnotation(ApiChasisParam.class);
+        Optional<ApiChasisEntity> chasisParam = context.findAnnotation(ApiChasisEntity.class);
         if (chasisParam.isPresent()) {
             this.addCustomModel(context, chasisParam.get().value());
         }
@@ -85,27 +85,35 @@ public class SwaggerComposer implements OperationModelsProviderPlugin, Operation
             StringBuilder postStringBuilder = new StringBuilder("public class " + clazz.getSimpleName() + "Post{");
             StringBuilder putStringBuilder = new StringBuilder("public class " + clazz.getSimpleName() + "Put{");
             for (Field f : clazz.getDeclaredFields()) {
+                Id id = f.getAnnotation(Id.class);
                 Column column = f.getAnnotation(Column.class);
                 JoinColumn joinColumn = f.getAnnotation(JoinColumn.class);
-                if(column != null){
+                if(id != null){
+                    putStringBuilder.append("public ").append(f.getType().getCanonicalName())
+                            .append(" ").append(f.getName()).append(";");
+                }else if(column != null){
                     if(column.insertable()) {
-                        postStringBuilder.append("public " + f.getType().getCanonicalName() + " " + f.getName() + ";");
+                        postStringBuilder.append("public ").append(f.getType().getCanonicalName())
+                                .append(" ").append(f.getName()).append(";");
                     }
                     if(column.updatable()){
-                        putStringBuilder.append("public " + f.getType().getCanonicalName() + " " + f.getName() + ";");
+                        putStringBuilder.append("public ").append(f.getType().getCanonicalName())
+                                .append(" ").append(f.getName()).append(";");
                     }
                 }else if(joinColumn != null){
                     if(joinColumn.insertable()) {
-                        postStringBuilder.append("public " + f.getType().getCanonicalName() + " " + f.getName() + ";");
+                        postStringBuilder.append("public ").append(f.getType().getCanonicalName())
+                                .append(" ").append(f.getName()).append(";");
                     }
                     if(joinColumn.updatable()){
-                        putStringBuilder.append("public " + f.getType().getCanonicalName() + " " + f.getName() + ";");
+                        putStringBuilder.append("public ").append(f.getType().getCanonicalName())
+                                .append(" ").append(f.getName()).append(";");
                     }
-                }
-                if (f.getAnnotation(Id.class) == null) {
-                    postStringBuilder.append("public " + f.getType().getCanonicalName() + " " + f.getName() + ";");
                 } else{
-                    postStringBuilder.append("public " + f.getType().getCanonicalName() + " " + f.getName() + ";");
+                    postStringBuilder.append("public ").append(f.getType().getCanonicalName())
+                                .append(" ").append(f.getName()).append(";");
+                    putStringBuilder.append("public ").append(f.getType().getCanonicalName())
+                                .append(" ").append(f.getName()).append(";");
                 }
 
             }
@@ -131,9 +139,9 @@ public class SwaggerComposer implements OperationModelsProviderPlugin, Operation
 
     @Override
     public void apply(OperationContext context) {
-        ArrayList<Parameter> params = new ArrayList<>();
-        if(context.findAnnotation(ApiChasisParam.class).isPresent()) {
-            Class oClazz = context.findAnnotation(ApiChasisParam.class).get().value();
+        ArrayList<Parameter> params = new ArrayList<>();        
+        if(context.findAnnotation(ApiChasisEntity.class).isPresent()) {
+            Class oClazz = context.findAnnotation(ApiChasisEntity.class).get().value();
             log.info("Found chasis param handling custom documentation");
             if (context.httpMethod().equals(HttpMethod.POST)) {
                 params.add(new ParameterBuilder()

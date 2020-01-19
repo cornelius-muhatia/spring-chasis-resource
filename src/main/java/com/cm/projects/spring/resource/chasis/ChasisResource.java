@@ -133,7 +133,7 @@ public class ChasisResource<T, E extends Serializable, R> {
      */
     @RequestMapping(method = RequestMethod.POST)
     @Transactional
-    @ApiOperation(value = "Create New Record", notes = "On success returns the id of created entity")
+    @ApiOperation(value = "Create New Record", notes = "On success returns the id of created entity")    
     public ResponseEntity<ResponseWrapper<E>> create(@Valid @RequestBody T t) {
 
         ResponseWrapper<E> response = new ResponseWrapper<>();
@@ -786,7 +786,7 @@ public class ChasisResource<T, E extends Serializable, R> {
             this.entityManager.detach(accessor.getWrappedInstance());
         }
         loggerService.log("Declined new " + nickName + "",
-                accessor.getWrappedClass().getName(), id, AppConstants.ACTIVITY_APPROVE, AppConstants.STATUS_ID_COMPLETED, notes);
+                accessor.getWrappedClass().getSimpleName(), id, AppConstants.ACTIVITY_APPROVE, AppConstants.STATUS_ID_COMPLETED, notes);
     }
 
     /**
@@ -824,7 +824,7 @@ public class ChasisResource<T, E extends Serializable, R> {
     protected void processDeclineDeletion(E id, BeanWrapper accessor, String notes, String nickName) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         this.setStatus(accessor, AppConstants.STATUS_ID_ACTIVE);
         loggerService.log("Done declining " + nickName + " deletion.",
-                accessor.getWrappedClass().getName(), id, AppConstants.ACTIVITY_APPROVE, AppConstants.STATUS_ID_COMPLETED, notes);
+                accessor.getWrappedClass().getSimpleName(), id, AppConstants.ACTIVITY_APPROVE, AppConstants.STATUS_ID_COMPLETED, notes);
     }
 
     /**
