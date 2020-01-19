@@ -1044,7 +1044,7 @@ public class ChasisResource<T, E extends Serializable, R> {
                     filterPreds.add(datePred);
                 } else if (request.getParameter(field.getName()) != null && !request.getParameter(field.getName()).isEmpty()) {
                     if (field.isAnnotationPresent(ManyToOne.class)) {
-                        BeanWrapper wrapper = new BeanWrapperImpl(field.getType());
+//                        BeanWrapper wrapper = new BeanWrapperImpl(field.getType());
                         String fieldName = "";
                         for (Field f : field.getType().getDeclaredFields()) {
                             if (f.isAnnotationPresent(Id.class)) {
@@ -1053,13 +1053,16 @@ public class ChasisResource<T, E extends Serializable, R> {
                             }
                         }
                         if(request.getParameterValues(field.getName()).length > 1) {
-                            List<Object> relFilters = new ArrayList<>();
+                            ArrayList<Object> relFilters = new ArrayList<>();
                             for(String paramFilter : request.getParameterValues(field.getName())){
+                                BeanWrapper wrapper = new BeanWrapperImpl(field.getType());
                                 wrapper.setPropertyValue(fieldName, paramFilter);
                                 relFilters.add(wrapper.getWrappedInstance());
                             }
+                            log.debug("Found array filter ({}) using in/contains predicate", relFilters);
                             filterPreds.add(root.get(field.getName()).in(relFilters));
                         } else{
+                            BeanWrapper wrapper = new BeanWrapperImpl(field.getType());
                             wrapper.setPropertyValue(fieldName, request.getParameter(field.getName()));
                             filterPreds.add(criteriaBuilder.equal(root.get(field.getName()), wrapper.getWrappedInstance()));
 

@@ -10,7 +10,6 @@ import com.cm.projects.spring.resource.chasis.exceptions.RunTimeBadRequest;
 import com.cm.projects.spring.resource.chasis.utils.CustomEntry;
 import com.cm.projects.spring.resource.chasis.utils.SharedMethods;
 import com.cm.projects.spring.resource.chasis.wrappers.ResponseWrapper;
-import org.apache.tomcat.util.http.fileupload.FileUploadBase.SizeLimitExceededException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
@@ -24,6 +23,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MultipartException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 /**
  * Controller advice to translate the server side exceptions to client-friendly
@@ -69,9 +69,9 @@ public class ExceptionTranslator {
         log.error("Multipart error: ", ex);
         ResponseWrapper response = new ResponseWrapper();
         response.setStatus(400);
-        if (ex.getCause().getCause() instanceof SizeLimitExceededException) {
-            SizeLimitExceededException sizeEx = (SizeLimitExceededException) ex.getCause().getCause();
-            response.setMessage("File size exceeded allowed limit (Permitted size: " + sizeEx.getPermittedSize() + " KB)");
+        if (ex.getCause().getCause() instanceof MaxUploadSizeExceededException) {
+            MaxUploadSizeExceededException sizeEx = (MaxUploadSizeExceededException) ex.getCause().getCause();
+            response.setMessage("File size exceeded allowed limit (Permitted size: " + sizeEx.getMaxUploadSize() + " KB)");
         } else {
             response.setMessage("File upload validation failed. Ensure the file is within the specified size and type");
         }
