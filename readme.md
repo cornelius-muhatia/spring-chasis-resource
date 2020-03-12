@@ -32,6 +32,23 @@ will return:
   "message": "Sorry validation errors occurred"
 }
 ```
+#### Unique Fields Validation
+Fields annotated with `@Unique` are used to check if we have an existing entity with the same field value.
+If the entity has "intrash" field all entities with "intrash" set to "yes" are ignored. Example:
+```java
+public class User{
+    @Unique
+    private String nationalId;
+    /*
+    *If set to yes it is assumed deleted hence ignored
+    */
+    private String intrash;
+}
+```
+
+#### Validate Relational Entities 
+Any field annotated by `@ManyToOne` and `@OneToOne` is treated as a relationship entity and is validated against the following rules:
+- If the field is a valid entity
 
 ##### Returns
 ResponseEntity with statuses:
