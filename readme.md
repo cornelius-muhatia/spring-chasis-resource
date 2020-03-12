@@ -15,8 +15,10 @@ Used to persist new entities to the database. The following validations are carr
 - Unique fields (Fields annotated with @Unique annotation)
 - Validates relational entities 
 
-> If the entity has a status field it is updated to 1 or `new Status(1);`. 
-> If the entity has intrash field it is updated to "NO"
+> #### Note
+> - If the entity has a status field it is updated to 1 or `new Status(1);`. 
+> - If the entity has intrash field it is updated to "NO"
+> - If an id field is present on the entity it will be reset to null.
 
 #### Javax Validations
 Default javax validation message will be used for example
@@ -96,8 +98,6 @@ ResponseEntity with statuses:
 - 400 on validation error
 - 404 for entities that don't exist
 
-> If an id field is present on the entity it will be reset to null.
-
 ### Update Resource
 Used to update entities by saving new changes to the edited record entity. For edited record to work The following annotation must be present on the relevant fields to be used to store changes;
 - @EditEntity used to store the name of the entity being updated preferably should be a string For example
@@ -123,7 +123,7 @@ private Long entityId;
 ResponseEntity with statuses:
 - 200 on success
 - 404 if the entity doesn't exist in the database
-- 400 on validation errors (Relies on javax validation)
+- 400 on validation errors (Relies on javax validation, unique and relational validation as specified on create resource above)
 - 409 on unique field validation errors
 - 417 if the entity us pending approval actions or if changes were not found on the current entity
 

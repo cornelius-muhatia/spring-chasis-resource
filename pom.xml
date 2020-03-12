@@ -109,4 +109,17 @@
             <url>https://api.bintray.com/maven/jdialogc/mvn-repository/SpringResourceChasis/;publish=1</url>
         </repository>
     </distributionManagement>
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.1.1</version>
+                <configuration>
+                    <reportOutputDirectory>${project.reporting.outputDirectory}/myoutput</reportOutputDirectory>
+                    <destDir>myapidocs</destDir>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
 </project>

@@ -15,6 +15,7 @@ import com.cm.projects.spring.resource.chasis.utils.*;
 import com.cm.projects.spring.resource.chasis.utils.export.CsvFlexView;
 import com.cm.projects.spring.resource.chasis.wrappers.ActionWrapper;
 import com.cm.projects.spring.resource.chasis.wrappers.ResponseWrapper;
+import com.cm.projects.spring.resource.chasis.wrappers.Status;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
@@ -193,7 +194,7 @@ public class ChasisResource<T, E extends Serializable, R> {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "Fetch single record using record id")
     public ResponseEntity<ResponseWrapper<T>> getEntity(@PathVariable("id") E id) {
-        ResponseWrapper response = new ResponseWrapper();
+        ResponseWrapper<T> response = new ResponseWrapper<>();
         response.setData(this.fetchEntity(id));
         return ResponseEntity.ok(response);
     }
@@ -203,12 +204,15 @@ public class ChasisResource<T, E extends Serializable, R> {
      *
      * @param accessor {@link PropertyAccessor}
      * @param statusId {@link Short} status id
+     * @throws InvocationTargetException,InstantiationException if can't instantiate {@link Status} entity
+     * @throws NoSuchMethodException setStatus() method doesn't exist
+     * @throws IllegalAccessException if getStatus() and setStatus() is not accessible
+     *
      */
     private void setStatus(PropertyAccessor accessor, Short statusId) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        if (accessor.getPropertyValue("status") instanceof Number || accessor.getPropertyType("status").isPrimitive()) {
+        if (accessor.getPropertyValue("status") instanceof Number || Objects.requireNonNull(accessor.getPropertyType("status")).isPrimitive()) {
             accessor.setPropertyValue("status", statusId);
         } else {
-//                Constructor constructor = accessor.getPropertyType("status").getDeclaredConstructor(Short.class);
             accessor.setPropertyValue("status", this.chasisService.instantiateEntity(statusId, accessor.getPropertyType("status")));
 
         }
@@ -227,7 +231,7 @@ public class ChasisResource<T, E extends Serializable, R> {
             if (status instanceof Number) {
                 return Short.valueOf(status + "");
             } else {
-                for (Field f : status.getClass().getDeclaredFields()) {
+                for (Field f : Objects.requireNonNull(status).getClass().getDeclaredFields()) {
                     if (f.isAnnotationPresent(Id.class)) {
                         PropertyAccessor sAccessor = PropertyAccessorFactory.forBeanPropertyAccess(status);
                         return Short.valueOf(sAccessor.getPropertyValue(f.getName()) + "");
@@ -285,8 +289,8 @@ public class ChasisResource<T, E extends Serializable, R> {
      *                                                                             string
      * @throws com.cm.projects.spring.resource.chasis.exceptions.ExpectationFailed When
      *                                                                             editEntity does not have fields; @{@link com.cm.projects.spring.resource.chasis.annotations.EditEntity},
-     * @{@link com.cm.projects.spring.resource.chasis.annotations.EditEntity}
-     * and @{@link com.cm.projects.spring.resource.chasis.annotations.EditEntityId}
+     * {@link com.cm.projects.spring.resource.chasis.annotations.EditEntity}
+     * and {@link com.cm.projects.spring.resource.chasis.annotations.EditEntityId}
      */
     @RequestMapping(method = RequestMethod.PUT)
     @ApiOperation(value = "Update record. If status field doesn't exist the entity is updated directly")
@@ -337,7 +341,7 @@ public class ChasisResource<T, E extends Serializable, R> {
             if (status instanceof Number) {
                 statusId = Short.valueOf(status + "");
             } else {
-                for (Field f : status.getClass().getDeclaredFields()) {
+                for (Field f : Objects.requireNonNull(status).getClass().getDeclaredFields()) {
                     if (f.isAnnotationPresent(Id.class)) {
                         PropertyAccessor sAccessor = PropertyAccessorFactory.forBeanPropertyAccess(status);
                         statusId = Short.valueOf(sAccessor.getPropertyValue(f.getName()) + "");

@@ -571,11 +571,11 @@ public class SupportRepository<T, E> {
     /**
      * Used to check has changes in the temp entity
      *
-     * @param id     entity id
+     * @param id entity id
      * @return entity if changes exists
      * @throws javax.persistence.NoResultException if changes were not found
      */
-    public List<E> getEntityChanges(Serializable id){
+    public List<E> getEntityChanges(Serializable id) {
         CriteriaQuery<E> c = this.builder.createQuery(editedEnClazz);
         Root criteriaRoot = c.from(editedEnClazz);
         Predicate[] preds = new Predicate[2];
@@ -598,9 +598,10 @@ public class SupportRepository<T, E> {
 
     /**
      * Used to clear all entity changes with the specified entity id
+     *
      * @param id entity id
      */
-    public void clearEntityChanges(Serializable id){
+    public void clearEntityChanges(Serializable id) {
         CriteriaDelete<E> c = this.builder.createCriteriaDelete(editedEnClazz);
         Root criteriaRoot = c.from(editedEnClazz);
         Predicate[] preds = new Predicate[2];
