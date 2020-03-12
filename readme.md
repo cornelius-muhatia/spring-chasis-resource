@@ -14,6 +14,10 @@ Used to persist new entities to the database. The following validations are carr
 - Javax validations (@NotNull, @Size)
 - Unique fields (Fields annotated with @Unique annotation)
 - Validates relational entities 
+
+> If the entity has a status field it is updated to 1 or `new Status(1);`. 
+> If the entity has intrash field it is updated to "NO"
+
 #### Javax Validations
 Default javax validation message will be used for example
 ```java
