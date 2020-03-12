@@ -34,17 +34,30 @@ will return:
 ```
 #### Unique Fields Validation
 Fields annotated with `@Unique` are used to check if we have an existing entity with the same field value.
-If the entity has "intrash" field all entities with "intrash" set to "yes" are ignored. Example:
+If the entity has "intrash" field then all entities with "intrash" set to "yes" are ignored. Example:
 ```java
 public class User{
     @Unique
     private String nationalId;
     /*
-    *If set to yes it is assumed deleted hence ignored
+    * If set to yes it is assumed deleted hence ignored
     */
     private String intrash;
 }
 ```
+For entities with compound unique keys the entity as to be annotated with `@CompoundUnique`. Example:
+```java
+import com.cm.projects.spring.resource.chasis.annotations.UniquePair;
+import com.cm.projects.spring.resource.chasis.annotations.CompoundUnique;
+
+@CompoundUnique(pairs = {@UniquePair(fields = {"documentId", "documentType"}, constraintName="User identification" )})
+public class User{
+    private String documentId;
+    private Short documentType;
+}
+```
+From the above example an existing entity is validated with both documentId and documentType. If the entity has 
+intrash field and is set to yes it is ignored.
 
 #### Validate Relational Entities 
 Any field annotated by `@ManyToOne` and `@OneToOne` is treated as a relationship entity and is validated against the following rules:
