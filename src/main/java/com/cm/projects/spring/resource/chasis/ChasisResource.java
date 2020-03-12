@@ -81,15 +81,20 @@ public class ChasisResource<T, E extends Serializable, R> {
      */
     protected SupportRepository<T, E> supportRepo;
     /**
-     *
+     * Events logs handler
      */
     protected Logger log = LoggerFactory.getLogger(this.getClass());
     private String fieldNickname = "field";
 
     /**
-     * @param loggerService
-     * @param entityManager
-     * @param chasisService
+     * Used to initialize:
+     * <ul>
+     *     <li>Record name from entity nickname. Refer to {@link NickName}</li>
+     *     <li>Initialize generic classes {@link ChasisResource#genericClasses}</li>
+     * </ul>
+     * @param loggerService {@link LoggerService} bean
+     * @param entityManager {@link EntityManager} for database queries
+     * @param chasisService {@link ChasisService} for makerchecker actions
      */
     public ChasisResource(LoggerService loggerService, EntityManager entityManager, ChasisService chasisService) {
         this.loggerService = loggerService;
@@ -99,12 +104,12 @@ public class ChasisResource<T, E extends Serializable, R> {
         this.supportRepo = new SupportRepository(entityManager, this.genericClasses.get(0), this.genericClasses.get(2));
         NickName nickName = AnnotationUtils.findAnnotation(this.genericClasses.get(0), NickName.class);
         this.recordName = (nickName == null) ? "Record" : nickName.name();
-        log.debug("Assigned record name {} to entity {}", this.recordName, this.genericClasses.get(0));
     }
 
     /**
-     * @param loggerService
-     * @param entityManager
+     * Initializes the default constructor with a new instance of {@link ChasisService}
+     * @param loggerService {@link LoggerService} bean for audit trail logging
+     * @param entityManager {@link EntityManager} for database queries
      */
     public ChasisResource(LoggerService loggerService, EntityManager entityManager) {
         this(loggerService, entityManager, new ChasisServiceTemplate(entityManager));

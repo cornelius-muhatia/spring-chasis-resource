@@ -14,6 +14,24 @@ Used to persist new entities to the database. The following validations are carr
 - Javax validations (@NotNull, @Size)
 - Unique fields (Fields annotated with @Unique annotation)
 - Validates relational entities 
+#### Javax Validations
+Default javax validation message will be used for example
+```java
+public class User{
+    @NotNull(message = "First name cannot be null")
+    private String firstName;
+}
+```
+will return:
+```json
+{
+  "status": 400,
+  "data": {
+            "firstName": "First name cannot be null"
+          },
+  "message": "Sorry validation errors occurred"
+}
+```
 
 ##### Returns
 ResponseEntity with statuses:

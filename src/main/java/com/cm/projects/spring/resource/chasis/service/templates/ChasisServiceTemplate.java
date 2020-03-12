@@ -61,7 +61,7 @@ public class ChasisServiceTemplate implements ChasisService {
     /**
      * Used to check if @{@link ManyToOne}field exists in the repository
      *
-     * @param field    Field to valdated
+     * @param field    Field to validated
      * @param accessor Bean wrapper accessor
      * @param clazz    Parent entity class
      * @throws NotFoundException if the relation entity doesn't exist in the repository
