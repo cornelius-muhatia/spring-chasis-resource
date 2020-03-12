@@ -60,8 +60,30 @@ From the above example an existing entity is validated with both documentId and 
 intrash field and is set to yes it is ignored.
 
 #### Validate Relational Entities 
-Any field annotated by `@ManyToOne` and `@OneToOne` is treated as a relationship entity and is validated against the following rules:
-- If the field is a valid entity
+Any field annotated by `@ManyToOne` and `@OneToMany` is treated as a relationship entity. Validations include:
+- Checks if the entity exists
+- If the entity has status field, checks if the entity is active(Status with id 2 is treated as active). For example:
+   ```java 
+    /**
+    * Current entity
+    */
+   import javax.persistence.ManyToOne;
+  
+   public class User{
+      @ManyToOne
+      private Group group;
+   }
+  
+  /**
+  * Relational Entity
+  */
+  public class Group{
+  @Id
+  private Short id;
+  private Short status = 2;
+  }
+  ```
+> Status can be either entity or just the id of the entity status as shown above
 
 ##### Returns
 ResponseEntity with statuses:
