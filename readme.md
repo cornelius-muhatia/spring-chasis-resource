@@ -174,3 +174,6 @@ Used to retrieve all entity records
 
 ##### Throws
 - **ParseException** - if request param date cannot be casted to **java.util.Date**
+
+## Reference
+1. [Java Docs](https://cornelius-muhatia.github.io/spring-chasis-resource/java-doc)

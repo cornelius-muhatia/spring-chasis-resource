@@ -1,0 +1,12 @@
+com.cm.projects.spring.resource.chasis
+com.cm.projects.spring.resource.chasis.annotations
+com.cm.projects.spring.resource.chasis.config
+com.cm.projects.spring.resource.chasis.exceptions
+com.cm.projects.spring.resource.chasis.repository
+com.cm.projects.spring.resource.chasis.service
+com.cm.projects.spring.resource.chasis.service.templates
+com.cm.projects.spring.resource.chasis.utils
+com.cm.projects.spring.resource.chasis.utils.export
+com.cm.projects.spring.resource.chasis.utils.security
+com.cm.projects.spring.resource.chasis.utils.test
+com.cm.projects.spring.resource.chasis.wrappers
