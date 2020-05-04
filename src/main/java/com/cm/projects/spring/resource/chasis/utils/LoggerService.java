@@ -1,7 +1,17 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright 2019 Cornelius M.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.cm.projects.spring.resource.chasis.utils;
@@ -74,85 +84,120 @@ public abstract class LoggerService {
     public void logCreate(String description, String entity, Object entityId, Short activityStatus){
         this.log(description, entity, entityId, ACTIVITY_CREATE, activityStatus, "");
     }
-//
-//    /**
-//     *
-//     * @param description
-//     * @param entity
-//     * @param entityId
-//     * @param activityStatus
-//     * @param notes
-//     */
-//    public void logCreate(String description, String entity, Object entityId, Short activityStatus, String notes){
-//        
-//    }
-//
-//    /**
-//     * Used to save audit log with activity type write
-//     *
-//     * @param description
-//     * @param entity
-//     * @param entityId
-//     * @param activityStatus
-//     * @param userId
-//     * @param notes
-//     */
-//    public void logCreate(String description, String entity, Object entityId, Short activityStatus, String userId, String notes){
-//        
-//    }
-//
-//    /**
-//     * Used to save audit log with activity type write
-//     *
-//     * @param description
-//     * @param entity
-//     * @param entityId
-//     * @param activityStatus
-//     * @param userId
-//     * @param ip
-//     * @param agent
-//     */
-//    public void logCreate(String description, String entity, Object entityId, Short activityStatus, String userId,
-//            String ip, String agent){
-//        
-//    }
-//
-//    /**
-//     * Save log with activity type update and current authenticated user
-//     *
-//     * @param description
-//     * @param Entity
-//     * @param entityId
-//     * @param activityStatus
-//     */
-//    public void logUpdate(String description, String Entity, Object entityId, Short activityStatus){
-//        
-//    }
-//
-//    /**
-//     * Save log with activity type update
-//     *
-//     * @param description
-//     * @param Entity
-//     * @param entityId
-//     * @param activityStatus
-//     * @param userId
-//     * @param notes
-//     */
-//    public void logUpdate(String description, String Entity, Object entityId, Short activityStatus, String userId, String notes){
-//        
-//    }
-//
-//    /**
-//     * Save log with activity type update
-//     *
-//     * @param description
-//     * @param Entity
-//     * @param entityId
-//     * @param activityStatus
-//     * @param notes
-//     */
-//    public void logUpdate(String description, String Entity, Object entityId, Short activityStatus, String notes){
-//        
-//    }
+
+    /**
+     * Handles audit log with activity type update
+     *
+     * @param description description
+     * @param entity entity name
+     * @param entityId entity id
+     * @param activityStatus activity status
+     * @param notes event description
+     */
+    public void logUpdate(String description, String entity, Object entityId, Short activityStatus, String notes){
+        this.log(description, entity, entityId, LoggerService.ACTIVITY_UPDATE, activityStatus, notes);
+    }
+
+    /**
+     * Handle audit trail with activity update and activity status complete
+     *
+     * @param description description
+     * @param entity entity name
+     * @param entityId entity id
+     * @param notes event description
+     */
+    public void logUpdateComplete(String description, String entity, Object entityId, String notes){
+        this.log(description, entity, entityId, LoggerService.ACTIVITY_UPDATE, AppConstants.STATUS_ID_COMPLETED, notes);
+    }
+
+    /**
+     * Handle audit trail with activity update and activity status failed
+     *
+     * @param description description
+     * @param entity entity name
+     * @param entityId entity id
+     * @param notes event description
+     */
+    public void logUpdateFailed(String description, String entity, Object entityId, String notes){
+        this.log(description, entity, entityId, LoggerService.ACTIVITY_UPDATE, AppConstants.STATUS_ID_FAILED, notes);
+    }
+
+    /**
+     * Handle audit trail with activity create and activity status completed
+     *
+     * @param description description
+     * @param entity entity name
+     * @param entityId entity id
+     */
+    public void logCreateComplete(String description, String entity, Object entityId){
+        this.log(description, entity, entityId, LoggerService.ACTIVITY_CREATE, AppConstants.STATUS_ID_COMPLETED, "");
+    }
+
+    /**
+     * Handle audit trail with activity create and activity status failed
+     *
+     * @param description description
+     * @param entity entity name
+     * @param entityId entity id
+     */
+    public void logCreateFailed(String description, String entity, Object entityId){
+        this.log(description, entity, entityId, LoggerService.ACTIVITY_CREATE, AppConstants.STATUS_ID_FAILED, "");
+    }
+
+    /**
+     * Handles audit trail
+     *
+     * @param builder {@link Builder}
+     */
+    public void log(Builder builder) {
+        this. log(builder.description, builder.entity, builder.entityId, builder.activity,
+                builder.activityStatus, builder.notes);
+    }
+
+    /**
+     * Event logs builder
+     */
+    public static class Builder{
+
+        public String description;
+        public String entity;
+        public Object entityId;
+        public String activity;
+        public Short activityStatus;
+        public String notes;
+
+        public Builder setDescription(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public Builder setEntity(String entity) {
+            this.entity = entity;
+            return this;
+        }
+
+        public Builder setEntityId(Object entityId) {
+            this.entityId = entityId;
+            return this;
+        }
+
+        public Builder setActivity(String activity) {
+            this.activity = activity;
+            return this;
+        }
+
+        public Builder setActivityStatus(Short activityStatus) {
+            this.activityStatus = activityStatus;
+            return this;
+        }
+
+        public Builder setNotes(String notes) {
+            this.notes = notes;
+            return this;
+        }
+
+        public static Builder instance(){
+            return new Builder();
+        }
+    }
 }
