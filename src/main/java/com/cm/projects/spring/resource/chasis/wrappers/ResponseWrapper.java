@@ -8,6 +8,8 @@ package com.cm.projects.spring.resource.chasis.wrappers;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 
 /**
@@ -19,12 +21,16 @@ import org.springframework.http.HttpStatus;
 public class ResponseWrapper <T> implements Serializable{  
     /**
      * Used to instantiate {@link ResponseWrapper} with status 200
+     * @deprecated use {@link ResponseWrapper#ok(Object)}
      */
-    public static ResponseWrapper OK = new ResponseWrapper();
+    @Deprecated
+    public static ResponseWrapper<Object> OK = new ResponseWrapper<>();
     /**
      * Used to instantiate {@link ResponseWrapper} with status 201
+     * @deprecated  user {@link ResponseWrapper#created(Object)}
      */
-    public static ResponseWrapper CREATED = new ResponseWrapper(201);
+    @Deprecated
+    public static ResponseWrapper<Object> CREATED = new ResponseWrapper<>(201);
     /**
      * HTTP Status status
      */
@@ -40,7 +46,7 @@ public class ResponseWrapper <T> implements Serializable{
     /**
      * Response timestamp
      */
-    private Long timestamp;
+    private Long timestamp = new Date().getTime();
     
     /**
      * Default constructor assigns timestamp with current timestamp, default success message and status status 200
@@ -54,7 +60,11 @@ public class ResponseWrapper <T> implements Serializable{
     public ResponseWrapper(int status) {
         this.status = status;
         this.message = "Request was successful";
-        this.timestamp = new Date().getTime();
+    }
+
+    public ResponseWrapper(HttpStatus status, String message) {
+        this.status = status.value();
+        this.message = message;
     }
 
     public ResponseWrapper(HttpStatus status, String message, T data) {
@@ -65,22 +75,24 @@ public class ResponseWrapper <T> implements Serializable{
 
     /**
      * Return default response with status created (status: 201)
-     * @param data
+     * @param data response data
+     * @param <E> data generic reference
      * @return {@link ResponseWrapper}
      */
-    public static ResponseWrapper created(Object data){
-        ResponseWrapper r = new ResponseWrapper(201);
+    public static <E> ResponseWrapper<E> created(E data){
+        ResponseWrapper<E> r = new ResponseWrapper<>(201);
         r.setData(data);
         return r;
     }
     
     /**
      * Return default response with status failed dependency (status: 424)
-     * @param data
+     * @param data response data
+     * @param <E> response data generic reference
      * @return {@link ResponseWrapper}
      */
-    public static ResponseWrapper failedDependency(Object data){
-        ResponseWrapper r = new ResponseWrapper(HttpStatus.FAILED_DEPENDENCY.value());
+    public static <E> ResponseWrapper<E> failedDependency(E data){
+        ResponseWrapper<E> r = new ResponseWrapper<>(HttpStatus.FAILED_DEPENDENCY.value());
         r.setMessage("Sorry some dependent fields could not be found");
         r.setData(data);
         return r;
@@ -88,22 +100,25 @@ public class ResponseWrapper <T> implements Serializable{
     
     /**
      * Return default ok response with given data
-     * @param data
-     * @return 
+     * @param data response data
+     * @param <E> generic reference
+     * @return {@link ResponseWrapper}
      */
-    public static ResponseWrapper ok(Object data){
-        ResponseWrapper r = ResponseWrapper.OK;
+    public static <E> ResponseWrapper<E> ok(E data){
+        ResponseWrapper<E> r = new ResponseWrapper<E>();
         r.setData(data);
+        r.setStatus(200);
         return r;
     }
     
     /**
      * Returns default not found response with given message
-     * @param message
-     * @return 
+     * @param message response data
+     * @param <E> response data generic reference
+     * @return {@link ResponseWrapper}
      */
-    public static ResponseWrapper  notFound(String message){
-        ResponseWrapper r = new ResponseWrapper();
+    public static <E> ResponseWrapper<E>  notFound(String message){
+        ResponseWrapper<E> r = new ResponseWrapper<>();
         r.setStatus(404);
         r.setMessage(message);
         return r;
@@ -113,10 +128,11 @@ public class ResponseWrapper <T> implements Serializable{
      * Returns default response with given status and message
      * @param status {@link HttpStatus}
      * @param message response message
+     * @param <E>  response data generic reference
      * @return {@link ResponseWrapper}
      */
-    public static ResponseWrapper status(HttpStatus status, String message){
-        ResponseWrapper r = new ResponseWrapper();
+    public static <E> ResponseWrapper<E> status(HttpStatus status, String message){
+        ResponseWrapper<E> r = new ResponseWrapper<>(status, message);
         r.setStatus(status);
         r.setMessage(message);
         return r;
@@ -124,16 +140,16 @@ public class ResponseWrapper <T> implements Serializable{
     
 
     /**
-     * Get status status
-     * @return 
+     * 
+     * @return Http status code
      */
     public int getStatus() {
         return status;
     }
 
     /**
-     * Set status code
-     * @param status 
+     * Set http status code
+     * @param status Http status code
      */
     public void setStatus(int status) {
         this.status = status;
@@ -141,15 +157,15 @@ public class ResponseWrapper <T> implements Serializable{
 
     /**
      * Set status code
-     * @param status
+     * @param status {@link HttpStatus}
      */
     public void setStatus(HttpStatus status){
         this.status = status.value();
     }
 
     /**
-     * get response message
-     * @return 
+     * 
+     * @return response message
      */
     public String getMessage() {
         return message;
@@ -157,7 +173,7 @@ public class ResponseWrapper <T> implements Serializable{
 
     /**
      * Set response message
-     * @param message 
+     * @param message response message
      */
     public void setMessage(String message) {
         this.message = message;
@@ -165,7 +181,7 @@ public class ResponseWrapper <T> implements Serializable{
 
     /**
      * Get response data
-     * @return 
+     * @return response data
      */
     public T getData() {
         return data;
@@ -173,15 +189,15 @@ public class ResponseWrapper <T> implements Serializable{
 
     /**
      * Set response data
-     * @param data 
+     * @param data resposne data
      */
     public void setData(T data) {
         this.data = data;
     }
 
     /**
-     * Get response timestamp
-     * @return 
+     * 
+     * @return response timestamp
      */
     public Long getTimestamp() {
         return timestamp;
@@ -189,7 +205,7 @@ public class ResponseWrapper <T> implements Serializable{
 
     /**
      * Set response timestamp
-     * @param timestamp 
+     * @param timestamp response timestamp
      */
     public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;

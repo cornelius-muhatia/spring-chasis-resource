@@ -85,7 +85,6 @@ public class ChasisResource<T, E extends Serializable, R> {
      * Events logs handler
      */
     protected Logger log = LoggerFactory.getLogger(this.getClass());
-    private String fieldNickname = "field";
 
     /**
      * Used to initialize:
@@ -413,7 +412,7 @@ public class ChasisResource<T, E extends Serializable, R> {
             @ApiResponse(code = 207, message = "Some records could not be processed successfully")
     })
     @Transactional
-    public ResponseEntity<ResponseWrapper> deleteEntity(@RequestBody @Valid ActionWrapper<E> actions) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+    public ResponseEntity<ResponseWrapper<List<String>>> deleteEntity(@RequestBody @Valid ActionWrapper<E> actions) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         ResponseWrapper<List<String>> response = new ResponseWrapper<>();
         List<String> errors = new ErrorList<>();
         for (E id : actions.getIds()) {
@@ -465,10 +464,6 @@ public class ChasisResource<T, E extends Serializable, R> {
 
     }
 
-    @ApiOperation(value = "Approve Record Actions")
-    @ApiResponses(value = {
-            @ApiResponse(code = 207, message = "Some records could not be processed successfully")
-    })
     /**
      * Used to approve actions (create, update, delete, deactivate). Also
      * ensures only the checker can approve an action
@@ -481,13 +476,18 @@ public class ChasisResource<T, E extends Serializable, R> {
      * <li>207 if some of the action could be approved successfuly. The data
      * fields contains more details on records that failed</li>
      * </ul>
-     * @throws
-     * com.cm.projects.spring.resource.chasis.exceptions.ExpectationFailed When
-     * entity doesn't have action or actionStatus fields
+     * @throws NoSuchMethodException getStatus() doesn't exist
+     * @throws InstantiationException can't instantiate {@link Status}
+     * @throws IllegalAccessException,InvocationTargetException getStatus() or setStatus() is not accessible
      */
+    @ApiOperation(value = "Approve Record Actions")
+    @ApiResponses(value = {
+            @ApiResponse(code = 207, message = "Some records could not be processed successfully")
+    })
     @RequestMapping(value = "/approve-actions", method = RequestMethod.PUT)
     @Transactional
-    public ResponseEntity<ResponseWrapper<List<String>>> approveActions(@RequestBody @Valid ActionWrapper<E> actions) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+    public ResponseEntity<ResponseWrapper<List<String>>> approveActions(@RequestBody @Valid ActionWrapper<E> actions)
+            throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         ResponseWrapper<List<String>> response = new ResponseWrapper<>();
         List<String> errors = new ErrorList<>();
 
@@ -1003,8 +1003,8 @@ public class ChasisResource<T, E extends Serializable, R> {
      */
     @ApiOperation(value = "Fetch all Records", notes = "")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "size", dataType = "integer", required = false, value = "Page size default is 20", paramType = "query"),
-            @ApiImplicitParam(name = "page", dataType = "integer", required = false, value = "Page number default is 0", paramType = "query"),
+            @ApiImplicitParam(name = "size", dataType = "integer", required = false, value = "Page size default is 20"),
+            @ApiImplicitParam(name = "page", dataType = "integer", required = false, value = "Page number default is 0"),
             @ApiImplicitParam(name = "sort", dataType = "string", required = false, value = "Field name e.g status,asc/desc",
                     paramType = "query", examples = @Example(value = {
                     @ExampleProperty(value = "'property': 'status,asc/desc'", mediaType = "application/json")}))
