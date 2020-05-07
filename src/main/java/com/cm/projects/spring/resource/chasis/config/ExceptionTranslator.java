@@ -154,7 +154,7 @@ public class ExceptionTranslator {
         log.error("Trying to reference id that doesn't exist", ex);
         ResponseWrapper<Map<String, Object>> response = new ResponseWrapper<>();
         response.setStatus(400);
-        response.setMessage("Sorry bad request, the specified id not found");
+        response.setMessage("Sorry bad request, the specified id doesn't exist");
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
