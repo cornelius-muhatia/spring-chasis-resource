@@ -17,7 +17,14 @@ import com.cm.projects.spring.resource.chasis.wrappers.ActionWrapper;
 import com.cm.projects.spring.resource.chasis.wrappers.ResponseWrapper;
 import com.cm.projects.spring.resource.chasis.wrappers.Status;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.*;
@@ -31,7 +38,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import springfox.documentation.annotations.ApiIgnore;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Id;
@@ -138,7 +144,7 @@ public class ChasisResource<T, E extends Serializable, R> {
      */
     @RequestMapping(method = RequestMethod.POST)
     @Transactional
-    @ApiOperation(value = "Create New Record", notes = "On success returns the id of created entity")    
+    @Operation(summary = "Create New Record", description = "On success returns the id of created entity")
     public ResponseEntity<ResponseWrapper<E>> create(@Valid @RequestBody T t) {
 
         ResponseWrapper<E> response = new ResponseWrapper<>();
@@ -191,7 +197,7 @@ public class ChasisResource<T, E extends Serializable, R> {
      * (data is null when entity could not be found) and status 200:
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    @ApiOperation(value = "Fetch single record using record id")
+    @Operation(summary = "Fetch single record using record id")
     public ResponseEntity<ResponseWrapper<T>> getEntity(@PathVariable("id") E id) {
         ResponseWrapper<T> response = new ResponseWrapper<>();
         response.setData(this.fetchEntity(id));
@@ -292,11 +298,11 @@ public class ChasisResource<T, E extends Serializable, R> {
      * and {@link com.cm.projects.spring.resource.chasis.annotations.EditEntityId}
      */
     @RequestMapping(method = RequestMethod.PUT)
-    @ApiOperation(value = "Update record. If status field doesn't exist the entity is updated directly")
+    @Operation(summary = "Update record. If status field doesn't exist the entity is updated directly")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Record not found")
+            @ApiResponse(responseCode = "404", description = "Record not found")
             ,
-            @ApiResponse(code = 417, message = "Record has unapproved actions or if record has not been modified")
+            @ApiResponse(responseCode = "417", description = "Record has unapproved actions or if record has not been modified")
     })
     @Transactional
     public ResponseEntity<ResponseWrapper<List<String>>> updateEntity(@RequestBody @Valid T t) throws IllegalAccessException, JsonProcessingException, ExpectationFailed, NoSuchMethodException, InstantiationException, InvocationTargetException {
@@ -407,9 +413,9 @@ public class ChasisResource<T, E extends Serializable, R> {
      * </ul>
      */
     @RequestMapping(method = RequestMethod.DELETE)
-    @ApiOperation(value = "Delete record")
+    @Operation(summary = "Delete record")
     @ApiResponses(value = {
-            @ApiResponse(code = 207, message = "Some records could not be processed successfully")
+            @ApiResponse(responseCode = "207", description = "Some records could not be processed successfully")
     })
     @Transactional
     public ResponseEntity<ResponseWrapper<List<String>>> deleteEntity(@RequestBody @Valid ActionWrapper<E> actions) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
@@ -480,9 +486,9 @@ public class ChasisResource<T, E extends Serializable, R> {
      * @throws InstantiationException can't instantiate {@link Status}
      * @throws IllegalAccessException,InvocationTargetException getStatus() or setStatus() is not accessible
      */
-    @ApiOperation(value = "Approve Record Actions")
+    @Operation(summary = "Approve Record Actions")
     @ApiResponses(value = {
-            @ApiResponse(code = 207, message = "Some records could not be processed successfully")
+            @ApiResponse(responseCode = "207", description = "Some records could not be processed successfully")
     })
     @RequestMapping(value = "/approve-actions", method = RequestMethod.PUT)
     @Transactional
@@ -703,9 +709,9 @@ public class ChasisResource<T, E extends Serializable, R> {
      */
     @RequestMapping(value = "/decline-actions", method = RequestMethod.PUT)
     @Transactional
-    @ApiOperation(value = "Decline Record Actions")
+    @Operation(summary = "Decline Record Actions")
     @ApiResponses(value = {
-            @ApiResponse(code = 207, message = "Some records could not be processed successfully")
+            @ApiResponse(responseCode = "207", description = "Some records could not be processed successfully")
     })
     public ResponseEntity<ResponseWrapper> declineActions(@RequestBody @Valid ActionWrapper<E> actions) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         ResponseWrapper response = new ResponseWrapper();
@@ -935,7 +941,7 @@ public class ChasisResource<T, E extends Serializable, R> {
      * @see SupportRepository#fetchChanges(Serializable, Object)
      */
     @RequestMapping(method = RequestMethod.GET, value = "/{id}/changes")
-    @ApiOperation(value = "Fetch Record Changes")
+    @Operation(summary = "Fetch Record Changes")
     public ResponseEntity<ResponseWrapper<List<String>>> fetchChanges(@PathVariable("id") E id) throws IllegalAccessException, IOException {
         ResponseWrapper<List<String>> response = new ResponseWrapper<>();
         response.setData(supportRepo.fetchChanges(id, this.fetchEntity(id)));
@@ -1001,16 +1007,16 @@ public class ChasisResource<T, E extends Serializable, R> {
      * @return
      * @throws ParseException if request param date cannot be casted to {@link Date}
      */
-    @ApiOperation(value = "Fetch all Records", notes = "")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "size", dataType = "integer", required = false, value = "Page size default is 20"),
-            @ApiImplicitParam(name = "page", dataType = "integer", required = false, value = "Page number default is 0"),
-            @ApiImplicitParam(name = "sort", dataType = "string", required = false, value = "Field name e.g status,asc/desc",
-                    paramType = "query", examples = @Example(value = {
-                    @ExampleProperty(value = "'property': 'status,asc/desc'", mediaType = "application/json")}))
+    @Operation(summary = "Fetch all Records", description = "")
+    @Parameters({
+            @Parameter(name = "size", in = ParameterIn.QUERY, required = false, description = "Page size default is 20"),
+            @Parameter(name = "page", in = ParameterIn.QUERY, required = false, description = "Page number default is 0"),
+            @Parameter(name = "sort", in = ParameterIn.QUERY, required = false, description = "Field name e.g status,asc/desc",
+                    examples = @ExampleObject(value = "'property': 'status,asc/desc'"))
     })
     @GetMapping
-    public ResponseEntity<ResponseWrapper<Page<T>>> findAll(@ApiIgnore Pageable pg, @ApiIgnore HttpServletRequest request) throws ParseException {
+    public ResponseEntity<ResponseWrapper<Page<T>>> findAll(@Parameter(hidden = true) Pageable pg,
+                                                            @Parameter(hidden = true) HttpServletRequest request) throws ParseException {
 
         ResponseWrapper response = new ResponseWrapper();
         CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
@@ -1147,9 +1153,9 @@ public class ChasisResource<T, E extends Serializable, R> {
      * </ul>
      */
     @PutMapping("/deactivate")
-    @ApiOperation(value = "Deactivate record")
+    @Operation(summary = "Deactivate record")
     @ApiResponses(value = {
-            @ApiResponse(code = 207, message = "Some records could not be processed successfully")
+            @ApiResponse(responseCode = "207", description = "Some records could not be processed successfully")
     })
     @Transactional
     public ResponseEntity<ResponseWrapper<List<String>>> deactivateRecord(@RequestBody @Valid ActionWrapper<E> actions) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
@@ -1206,9 +1212,9 @@ public class ChasisResource<T, E extends Serializable, R> {
      * </ul>
      */
     @PutMapping("/activate")
-    @ApiOperation(value = "Activate records")
+    @Operation(summary = "Activate records")
     @ApiResponses(value = {
-            @ApiResponse(code = 207, message = "Some records could not be processed successfully")
+            @ApiResponse(responseCode = "207", description = "Some records could not be processed successfully")
     })
     @Transactional
     public ResponseEntity<ResponseWrapper<List<String>>> activateRecord(@RequestBody @Valid ActionWrapper<E> actions) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
@@ -1265,9 +1271,9 @@ public class ChasisResource<T, E extends Serializable, R> {
      * </ul>
      */
     @PutMapping("/lock")
-    @ApiOperation(value = "Lock record")
+    @Operation(summary = "Lock record")
     @ApiResponses(value = {
-            @ApiResponse(code = 207, message = "Some records could not be processed successfully")
+            @ApiResponse(responseCode = "207", description = "Some records could not be processed successfully")
     })
     @Transactional
     public ResponseEntity<ResponseWrapper<List<String>>> lockRecord(@RequestBody @Valid ActionWrapper<E> actions) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
@@ -1324,9 +1330,9 @@ public class ChasisResource<T, E extends Serializable, R> {
      * </ul>
      */
     @PutMapping("/unlock")
-    @ApiOperation(value = "Unlock record")
+    @Operation(summary = "Unlock record")
     @ApiResponses(value = {
-            @ApiResponse(code = 207, message = "Some records could not be processed successfully")
+            @ApiResponse(responseCode = "207", description = "Some records could not be processed successfully")
     })
     @Transactional
     public ResponseEntity<ResponseWrapper<List<String>>> unLockRecord(@RequestBody @Valid ActionWrapper<E> actions) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
@@ -1371,7 +1377,7 @@ public class ChasisResource<T, E extends Serializable, R> {
 
     }
 
-    @ApiOperation(value = "Export Record To CSV")
+    @Operation(summary = "Export Record To CSV")
     @GetMapping("/export.csv")
     public ModelAndView exportCsv(Pageable pg, HttpServletRequest request) throws ParseException {
         return new ModelAndView(new CsvFlexView<T>(this.genericClasses.get(0), this.chasisService.findAll(pg, this.genericClasses.get(0), request, entityManager), this.recordName));
